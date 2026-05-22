@@ -16,3 +16,30 @@
 
 ### Next Step:
 - Write the calculation logic in `auditEngine.js` to flag small teams paying for expensive corporate tiers they don't need.
+
+---
+
+# Day 2: May 21, 2026
+**Time spent:** ~2 hours
+
+### Done:
+- Built `auditEngine.js` with 7 audit rules:
+  - Small team on expensive tier
+  - Redundant coding tools (Cursor + Copilot overlap)
+  - API direct vs subscription arbitrage
+  - Enterprise overkill for teams <10
+  - Seat vs team size mismatch
+  - Spend sanity check
+  - Optimal state detection
+- All recommendations cite actual numbers (e.g., "Team of 5 on Business ($40/seat) → Pro ($20/seat) = $100/mo savings")
+- Redundancy detection for overlapping tool categories
+
+### Decisions & Lessons:
+- Went with rule-based logic for clarity and defensibility
+- Every reason string includes specific numbers and reasoning
+
+### Blockers:
+- Deciding between rule-based vs AI scoring → went with rule-based for defensibility and clarity.
+
+### Next Step:
+- Build frontend UI: spend input form and results display

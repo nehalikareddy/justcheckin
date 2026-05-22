@@ -1,27 +1,53 @@
+// frontend/src/pricingData.js
+
 /**
- * GLOBAL AI TOOL SUBSCRIPTION PRICING REFERENCE
- * All values are hardcoded in USD ($) and reflect standard monthly retail rates.
- * Business/Team tiers are calculated "per seat, per month".
+ * COMPREHENSIVE AI TOOL & API SUBSCRIPTION PRICING REFERENCE
+ * Values represent standard monthly retail rates in USD ($).
+ * For API tiers, values represent estimated average monthly spend baselines per seat.
  */
 export const AI_PRICING = {
   cursor: {
-    pro: 20,       // $20 / individual / month
-    business: 40   // $40 / user / month (Teams)
+    hobby: 0,
+    pro: 20,
+    business: 40,
+    enterprise: 100 // Enterprise custom baseline
   },
   githubCopilot: {
-    individual: 10, // $10 / individual / month
-    business: 19,   // $19 / user / month
-    enterprise: 39  // $39 / user / month
+    individual: 10,
+    business: 19,
+    enterprise: 39
   },
   claude: {
-    pro: 20,       // $20 / individual / month
-    team: 30       // $30 / user / month
+    free: 0,
+    pro: 20,
+    max: 50,     // Claude Max tier baseline
+    team: 30,
+    enterprise: 95,
+    apiDirect: 45 // Estimated developer monthly API spend token baseline
   },
   chatgpt: {
-    plus: 20,      // $20 / individual / month
-    team: 25       // $25 / user / month
+    plus: 20,
+    team: 25,
+    enterprise: 60,
+    apiDirect: 40 // Estimated developer monthly API spend token baseline
+  },
+  anthropicApiDirect: {
+    apiDirect: 45 // Standalone Anthropic API usage baseline per dev
+  },
+  openaiApiDirect: {
+    apiDirect: 40 // Standalone OpenAI API usage baseline per dev
   },
   gemini: {
-    pro: 20        // $20 / individual / month
+    pro: 20,
+    ultra: 30,   // Google One AI Premium baseline
+    api: 35      // Google AI Studio/Vertex API spend baseline
+  },
+  windsurf: {
+    free: 0,
+    pro: 15,
+    team: 30
   }
 };
+
+// Valid options for the primary use case dropdown
+export const USE_CASES = ['coding', 'writing', 'data', 'research', 'mixed'];
