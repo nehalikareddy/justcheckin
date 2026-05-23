@@ -18,8 +18,10 @@
 - Write the calculation logic in `auditEngine.js` to flag small teams paying for expensive corporate tiers they don't need.
 
 ---
+(Note: May 21, 2026 was skipped with no progress due to university lab exam.)
+---
 
-# Day 2: May 21, 2026
+# Day 2: May 22, 2026
 **Time spent:** ~2 hours
 
 ### Done:
@@ -43,3 +45,25 @@
 
 ### Next Step:
 - Build frontend UI: spend input form and results display
+
+---
+
+# Day 3: May 22, 2026
+**Time spent:** ~5 hours
+
+### Done:
+- Built the complete React frontend (Hero, SpendForm, AuditResults).
+- Added Tailwind CSS v4 and styled with a dark theme.
+- Wired up localStorage to save form state automatically.
+- Integrated the UI with `auditEngine.js` to show real-time savings.
+- Built EmailGate and ShareButton for lead capture and virality.
+
+### Decisions & Lessons:
+- Kept the form layout as a clean single-column list instead of cards to handle many tools better.
+- Tailwind v4 setup is slightly different but much cleaner with just `@import "tailwindcss"`.
+
+### Blockers:
+- Getting the layout right for 8+ tools without overflowing the screen required some CSS grid adjustments, but it's fixed now.
+
+### Next Step:
+- Build the shareable results page with React Router, Open Graph tags, and MongoDB backend schema connections.

@@ -18,7 +18,7 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'dummy-anthropic-key' });
 
 app.post('/api/generate-summary', async (req, res) => {
   const { auditData } = req.body;
@@ -41,7 +41,7 @@ app.post('/api/generate-summary', async (req, res) => {
 });
 
 // Lead capture and email notifications
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_dummykey');
 
 app.post('/api/capture-lead', async (req, res) => {
   const { email, company, role, teamSize, totalSavings, publicUrlId } = req.body;
