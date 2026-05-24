@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ShareButton from './ShareButton';
 
-export default function EmailGate({ totalSavings, teamSize, auditData }) {
+export default function EmailGate({ totalSavings, teamSize, auditData, publicUrlId }) {
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [publicUrlId, setPublicUrlId] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [finalPublicUrlId, setFinalPublicUrlId] = useState(publicUrlId || '');
+
+  // Keep state updated in case parent loads it asynchronously
+  useEffect(() => {
+    if (publicUrlId) {
+      setFinalPublicUrlId(publicUrlId);
+    }
+  }, [publicUrlId]);
 
   // Determine CTA text based on savings thresholds
   let ctaText = 'Email me my audit report';
@@ -25,9 +32,11 @@ export default function EmailGate({ totalSavings, teamSize, auditData }) {
     setLoading(true);
     setErrorMsg('');
 
-    // Generate public ID using simple cryptographically secure or pseudo-random slice
-    const generatedId = Math.random().toString(36).substring(2, 10);
-    setPublicUrlId(generatedId);
+    // Generate public ID fallback if not provided by server yet
+    const activeUrlId = finalPublicUrlId || Math.random().toString(36).substring(2, 10);
+    if (!finalPublicUrlId) {
+      setFinalPublicUrlId(activeUrlId);
+    }
 
     const payload = {
       email,
@@ -35,7 +44,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData }) {
       role: role || undefined,
       teamSize,
       totalSavings,
-      publicUrlId: generatedId,
+      publicUrlId: activeUrlId,
       auditData
     };
 
@@ -61,7 +70,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData }) {
   };
 
   if (submitted) {
-    const reportLink = `${window.location.origin}/report/${publicUrlId}`;
+    const reportLink = `${window.location.origin}/report/${finalPublicUrlId}`;
     return (
       <div className="w-full max-w-xl mx-auto p-8 bg-zinc-900 border border-emerald-500/20 rounded-2xl text-center glass-card space-y-6 animate-fade-in">
         <div className="mx-auto w-12 h-12 bg-emerald-950/40 border border-emerald-500/30 rounded-full flex items-center justify-center">
@@ -87,7 +96,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData }) {
           </a>
         </div>
         <div className="flex justify-center pt-2">
-          <ShareButton publicUrlId={publicUrlId} />
+          <ShareButton publicUrlId={finalPublicUrlId} />
         </div>
       </div>
     );

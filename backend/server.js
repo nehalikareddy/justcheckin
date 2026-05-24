@@ -3,12 +3,23 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const crypto = require('crypto');
+const Audit = require('./models/Audit');
 const { Anthropic } = require('@anthropic-ai/sdk');
 const { Resend } = require('resend');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Connect MongoDB
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/justcheckin';
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.warn('Backend running without database persistence.');
+  });
 
 // Rate limiting: prevent spam on API routes
 const apiLimiter = rateLimit({
@@ -40,6 +51,42 @@ app.post('/api/generate-summary', async (req, res) => {
   }
 });
 
+// NEW endpoint: Save audit + return publicUrlId
+app.post('/api/save-audit', async (req, res) => {
+  const { auditResult, teamSize, useCase } = req.body;
+  try {
+    const publicUrlId = crypto.randomBytes(4).toString('hex'); // e.g. "a3f2c1d8"
+    await Audit.create({
+      publicUrlId,
+      totalMonthlySavings: auditResult.totalMonthlySavings,
+      totalAnnualSavings: auditResult.totalAnnualSavings,
+      overallVerdict: auditResult.overallVerdict,
+      perTool: auditResult.perTool,
+      useCase,
+      teamSize
+    });
+    res.json({ publicUrlId });
+  } catch (error) {
+    console.error('Save audit error:', error);
+    res.status(500).json({ error: 'Failed to save audit' });
+  }
+});
+
+// NEW endpoint: Fetch public audit (strips email/company/role)
+app.get('/api/audit/:publicUrlId', async (req, res) => {
+  try {
+    const audit = await Audit.findOne(
+      { publicUrlId: req.params.publicUrlId },
+      { email: 0, company: 0, role: 0 } // exclude private fields
+    );
+    if (!audit) return res.status(404).json({ error: 'Audit not found' });
+    res.json(audit);
+  } catch (error) {
+    console.error('Fetch audit error:', error);
+    res.status(500).json({ error: 'Failed to fetch audit' });
+  }
+});
+
 // Lead capture and email notifications
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummykey');
 
@@ -47,16 +94,37 @@ app.post('/api/capture-lead', async (req, res) => {
   const { email, company, role, teamSize, totalSavings, publicUrlId } = req.body;
 
   try {
-    // 1. Save to Database (MongoDB logic goes here)
-    // await Lead.create({ email, company, role, teamSize, totalSavings, publicUrlId });
+    // 1. Save to Database (MongoDB logic)
+    let audit = await Audit.findOne({ publicUrlId });
+    if (!audit) {
+      // Graceful fallback if MongoDB failed to save or is offline
+      audit = await Audit.create({
+        publicUrlId,
+        totalMonthlySavings: totalSavings,
+        totalAnnualSavings: totalSavings * 12,
+        overallVerdict: "AI Spend Audit",
+        perTool: [],
+        email,
+        company,
+        role,
+        teamSize,
+        emailSent: true
+      });
+    } else {
+      audit.email = email;
+      audit.company = company;
+      audit.role = role;
+      audit.emailSent = true;
+      await audit.save();
+    }
 
-    // Send confirmation e
+    // Send confirmation email
     await resend.emails.send({
       from: 'JustCheckin <onboarding@resend.dev>',
       to: email,
       subject: 'Your AI Spend Audit Results 🔍',
       html: `<p>Thanks for using JustCheckin! You have a potential savings of $${totalSavings}/mo.</p>
-             <p>Access your full report here: justcheckin.com/report/${publicUrlId}</p>
+             <p>Access your full report here: http://localhost:5173/report/${publicUrlId}</p>
              ${totalSavings > 500 ? '<p>Since your savings are substantial, Credex will be in touch to help you capture them.</p>' : ''}`
     });
 

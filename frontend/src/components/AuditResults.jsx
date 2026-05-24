@@ -3,7 +3,7 @@ import SavingsHero from './SavingsHero';
 import ToolResult from './ToolResult';
 import EmailGate from './EmailGate';
 
-export default function AuditResults({ auditResult, teamSize, auditData, onBackToForm }) {
+export default function AuditResults({ auditResult, teamSize, auditData, onBackToForm, publicUrlId }) {
   const { perTool, totalMonthlySavings, totalAnnualSavings } = auditResult;
   const isHighSavings = totalMonthlySavings > 500;
 
@@ -75,6 +75,7 @@ export default function AuditResults({ auditResult, teamSize, auditData, onBackT
           totalSavings={totalMonthlySavings}
           teamSize={teamSize}
           auditData={auditData}
+          publicUrlId={publicUrlId}
         />
       </div>
 

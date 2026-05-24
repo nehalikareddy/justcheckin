@@ -67,3 +67,12 @@
 
 ### Next Step:
 - Build the shareable results page with React Router, Open Graph tags, and MongoDB backend schema connections.
+
+---
+
+## Day 4 — 2026-05-23
+**Hours worked:** 5
+**What I did:** Built MongoDB Audit schema with public/private field separation. Added /api/save-audit and GET /api/audit/:id endpoints. Built PublicReport.jsx — the shareable page that strips identifying info. Added React Router for /report/:id routes. Added full OG and Twitter Card meta tags to index.html. Created OG image. Wired up the full flow: form → audit → save → share URL.
+**What I learned:** MongoDB excludes work differently in Mongoose — you can't mix include and exclude in the same projection except for _id. Had to restructure the public endpoint.
+**Blockers / what I'm stuck on:** Dynamic OG meta tags are hard with a pure React SPA — the preview image for individual reports will use the static OG image for now. Proper SSR-based OG would need Next.js, but our architecture doesn't change at this stage.
+**Plan for tomorrow:** AI summary integration polish, full email template, UI polish pass, start on markdown files.

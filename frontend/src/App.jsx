@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Hero from './components/Hero';
 import SpendForm from './components/SpendForm';
 import AuditResults from './components/AuditResults';
+import PublicReport from './components/PublicReport';
 import { runAudit } from './auditEngine';
 
-export default function App() {
+function HomeView() {
   const [view, setView] = useState('landing');
   const [formData, setFormData] = useState({
     teamSize: '',
@@ -12,6 +14,7 @@ export default function App() {
     tools: []
   });
   const [auditResult, setAuditResult] = useState(null);
+  const [publicUrlId, setPublicUrlId] = useState('');
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -38,14 +41,36 @@ export default function App() {
     }
   }, [formData]);
 
-  const handleRunAudit = () => {
+  const handleRunAudit = async () => {
     try {
       const result = runAudit(formData);
       setAuditResult(result);
       setView('results');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Save audit to DB in the background immediately
+      const response = await fetch('/api/save-audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          auditResult: result,
+          teamSize: Number(formData.teamSize),
+          useCase: formData.useCase
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPublicUrlId(data.publicUrlId);
+      } else {
+        // Fallback random ID if database save failed
+        const generatedId = Math.random().toString(36).substring(2, 10);
+        setPublicUrlId(generatedId);
+      }
     } catch (err) {
-      console.error('Failed to run audit:', err);
+      console.error('Failed to run/save audit:', err);
+      // Fallback random ID if network error occurred
+      const generatedId = Math.random().toString(36).substring(2, 10);
+      setPublicUrlId(generatedId);
     }
   };
 
@@ -131,6 +156,7 @@ export default function App() {
             teamSize={formData.teamSize}
             auditData={formData}
             onBackToForm={handleBackToForm}
+            publicUrlId={publicUrlId}
           />
         )}
       </main>
@@ -154,5 +180,16 @@ export default function App() {
       </footer>
 
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomeView />} />
+        <Route path="/report/:publicUrlId" element={<PublicReport />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
