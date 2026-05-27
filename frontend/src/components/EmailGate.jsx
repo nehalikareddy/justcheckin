@@ -9,6 +9,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [localPublicUrlId, setLocalPublicUrlId] = useState('');
+  const [emailSkipped, setEmailSkipped] = useState(false);
 
   // Determine CTA text based on savings thresholds
   let ctaText = 'Email me my audit report';
@@ -25,11 +26,9 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
     setLoading(true);
     setErrorMsg('');
 
-    // Generate public ID fallback if not provided by server yet
-    const activeUrlId = publicUrlId || localPublicUrlId || Math.random().toString(36).substring(2, 10);
-    if (!publicUrlId && !localPublicUrlId) {
-      setLocalPublicUrlId(activeUrlId);
-    }
+    // If publicUrlId is empty/falsy AND localPublicUrlId is also empty, do NOT generate a random fallback.
+    // Instead, skip publicUrlId in the payload (send it as undefined/null).
+    const activeUrlId = publicUrlId || localPublicUrlId || null;
 
     const payload = {
       email,
@@ -37,7 +36,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
       role: role || undefined,
       teamSize,
       totalSavings,
-      publicUrlId: activeUrlId,
+      publicUrlId: activeUrlId || undefined,
       auditData
     };
 
@@ -52,18 +51,21 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
         throw new Error('API server responded with error');
       }
 
+      const data = await response.json();
+      if (data && data.emailSent === false) {
+        setEmailSkipped(true);
+      }
       setSubmitted(true);
     } catch (err) {
-      console.warn('Backend server offline or unreachable. Simulating lead capture success for client evaluation...', err);
-      // Graceful fallback to simulate success
-      setSubmitted(true);
+      setErrorMsg('Could not send email. The server may be offline or email is not configured. Your audit results are still available on this page.');
     } finally {
       setLoading(false);
     }
   };
 
   if (submitted) {
-    const reportLink = `${window.location.origin}/report/${publicUrlId || localPublicUrlId}`;
+    const showShareable = !!(publicUrlId || localPublicUrlId);
+    const reportLink = showShareable ? `${window.location.origin}/report/${publicUrlId || localPublicUrlId}` : '';
     return (
       <div className="w-full max-w-xl mx-auto p-8 bg-sea-dark border border-sea-medium/30 rounded-2xl text-center glass-card space-y-6 animate-fade-in">
         <div className="mx-auto w-12 h-12 bg-sea-darkest border border-sea-medium/45 rounded-full flex items-center justify-center">
@@ -72,25 +74,37 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
           </svg>
         </div>
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-sea-cream">Check your inbox!</h3>
-          <p className="text-sm text-sea-light">
-            We've sent a summary to <span className="text-sea-cream font-semibold">{email}</span>.
+          <h3 className="text-xl font-bold text-sea-cream">
+            {emailSkipped ? 'Lead captured! Email sending is not configured on this server.' : 'Check your inbox!'}
+          </h3>
+          {!emailSkipped && (
+            <p className="text-sm text-sea-light">
+              We've sent a summary to <span className="text-sea-cream font-semibold">{email}</span>.
+            </p>
+          )}
+        </div>
+        {showShareable ? (
+          <>
+            <div className="p-4 bg-sea-darkest/90 border border-sea-medium/25 rounded-xl space-y-2">
+              <span className="block text-[10px] uppercase font-bold text-sea-light/70 tracking-wider">Public Shareable Report URL</span>
+              <a
+                href={reportLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-sm text-sea-light hover:text-sea-cream font-medium break-all underline"
+              >
+                {reportLink}
+              </a>
+            </div>
+            <div className="flex justify-center pt-2">
+              <ShareButton publicUrlId={publicUrlId || localPublicUrlId} />
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-sea-light bg-sea-darkest/90 border border-sea-medium/25 rounded-xl p-4">
+            Your audit results were captured but a shareable report link is not available (database may be offline).
           </p>
-        </div>
-        <div className="p-4 bg-sea-darkest/90 border border-sea-medium/25 rounded-xl space-y-2">
-          <span className="block text-[10px] uppercase font-bold text-sea-light/70 tracking-wider">Public Shareable Report URL</span>
-          <a
-            href={reportLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-sm text-sea-light hover:text-sea-cream font-medium break-all underline"
-          >
-            {reportLink}
-          </a>
-        </div>
-        <div className="flex justify-center pt-2">
-          <ShareButton publicUrlId={publicUrlId || localPublicUrlId} />
-        </div>
+        )}
       </div>
     );
   }

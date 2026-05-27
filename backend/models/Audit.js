@@ -10,7 +10,15 @@ const ToolResultSchema = new mongoose.Schema({
   monthlySavings: Number,
   annualSavings: Number,
   flag: String,
-  reason: String
+  reason: String,
+  alternativeTool: {
+    name: String,
+    reason: String
+  },
+  creditsOpportunity: {
+    program: String,
+    reason: String
+  }
 });
 
 const AuditSchema = new mongoose.Schema({

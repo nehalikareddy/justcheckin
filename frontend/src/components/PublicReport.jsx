@@ -10,11 +10,12 @@ export default function PublicReport() {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    setTimeout(() => setLoading(true), 0);
     fetch(`/api/audit/${publicUrlId}`)
       .then((res) => {
         if (!res.ok) {
-          throw new Error('Audit report not found');
+          const error = new Error(res.status === 404 ? '404' : 'Failed to fetch');
+          error.status = res.status;
+          throw error;
         }
         return res.json();
       })
@@ -24,7 +25,13 @@ export default function PublicReport() {
       })
       .catch((err) => {
         console.error('Error fetching audit:', err);
-        setErrorMsg('We could not retrieve this audit. It may not exist or has expired.');
+        if (err.status === 404) {
+          setErrorMsg('This audit report was not found. It may have been generated without a database connection.');
+        } else if (err.status === undefined || err.name === 'TypeError') {
+          setErrorMsg('Could not connect to the server. Please check if the backend is running.');
+        } else {
+          setErrorMsg('We could not retrieve this audit. It may not exist or has expired.');
+        }
         setLoading(false);
       });
   }, [publicUrlId]);
@@ -54,7 +61,8 @@ export default function PublicReport() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 select-none group">
             <div className="w-8 h-8 rounded-lg overflow-hidden bg-sea-dark border border-sea-medium/30 flex items-center justify-center p-1 group-hover:border-sea-light/50 transition-colors flex-shrink-0">
-              <img src="/logo.png" className="w-full h-full object-contain" alt="J Logo" />
+              {/* TODO: Replace logo.png (4.9MB) with an optimized version under 50KB */}
+              <img src="/logo.png" className="w-full h-full object-contain" alt="J Logo" width="32" height="32" loading="eager" decoding="async" />
             </div>
             <span className="font-bold text-white tracking-tight group-hover:text-sea-light transition-colors">
               JustCheckin

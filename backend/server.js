@@ -7,23 +7,40 @@ const crypto = require('crypto');
 const Audit = require('./models/Audit');
 const { Resend } = require('resend');
 
+if (!process.env.FRONTEND_URL) {
+  console.warn('WARNING: FRONTEND_URL not set. Email links will point to localhost.');
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // Connect MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/justcheckin';
+let dbConnected = false;
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log('MongoDB connected successfully'))
+  .then(() => {
+    console.log('MongoDB connected successfully');
+    dbConnected = true;
+  })
   .catch(err => {
     console.error('MongoDB connection error:', err);
     console.warn('Backend running without database persistence.');
+    dbConnected = false;
   });
+
+// Middleware to check DB connection
+const requireDB = (req, res, next) => {
+  if (!dbConnected) {
+    return res.status(503).json({ error: 'Database is temporarily unavailable. Please try again later.' });
+  }
+  next();
+};
 
 // Rate limiting: prevent spam on API routes
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // max requests per IP per window
+  max: 100, // max requests per IP per window
   message: { error: "Too many requests. Please try again later." }
 });
 app.use('/api/', apiLimiter);
@@ -153,7 +170,7 @@ ${JSON.stringify(auditData, null, 2)}
 });
 
 // NEW endpoint: Save audit + return publicUrlId
-app.post('/api/save-audit', async (req, res) => {
+app.post('/api/save-audit', requireDB, async (req, res) => {
   const { auditResult, teamSize, useCase } = req.body;
   try {
     const publicUrlId = crypto.randomBytes(4).toString('hex'); // e.g. "a3f2c1d8"
@@ -174,7 +191,7 @@ app.post('/api/save-audit', async (req, res) => {
 });
 
 // NEW endpoint: Fetch public audit (strips email/company/role)
-app.get('/api/audit/:publicUrlId', async (req, res) => {
+app.get('/api/audit/:publicUrlId', requireDB, async (req, res) => {
   try {
     const audit = await Audit.findOne(
       { publicUrlId: req.params.publicUrlId },
@@ -189,10 +206,10 @@ app.get('/api/audit/:publicUrlId', async (req, res) => {
 });
 
 // Lead capture and email notifications
-const resend = new Resend(process.env.RESEND_API_KEY || 're_dummykey');
-
-app.post('/api/capture-lead', async (req, res) => {
+app.post('/api/capture-lead', requireDB, async (req, res) => {
   const { email, company, role, teamSize, totalSavings, publicUrlId } = req.body;
+  const apiKey = process.env.RESEND_API_KEY || 're_dummykey';
+  const isDummyKey = apiKey === 're_dummykey' || apiKey.startsWith('your_');
 
   try {
     // 1. Save to Database (MongoDB logic)
@@ -209,17 +226,22 @@ app.post('/api/capture-lead', async (req, res) => {
         company,
         role,
         teamSize,
-        emailSent: true
+        emailSent: !isDummyKey
       });
     } else {
       audit.email = email;
       audit.company = company;
       audit.role = role;
-      audit.emailSent = true;
+      audit.emailSent = !isDummyKey;
       await audit.save();
     }
 
+    if (isDummyKey) {
+      return res.status(200).json({ success: true, message: "Lead captured. Email sending is not configured.", emailSent: false });
+    }
+
     // Send confirmation email
+    const resend = new Resend(apiKey);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     await resend.emails.send({
       from: 'JustCheckin <onboarding@resend.dev>',
@@ -263,12 +285,12 @@ app.post('/api/capture-lead', async (req, res) => {
       JustCheckin · A free tool by Credex · <a href="https://credex.rocks" style="color: #64748b; text-decoration: underline;">credex.rocks</a>
     </p>
   </div>
-</body>
+ </body>
 </html>
 `
     });
 
-    res.status(200).json({ success: true, message: "Lead captured and email sent." });
+    res.status(200).json({ success: true, message: "Lead captured and email sent.", emailSent: true });
   } catch (error) {
     console.error("Lead Capture Error:", error);
     res.status(500).json({ error: "Failed to process lead." });

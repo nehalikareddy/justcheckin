@@ -18,7 +18,7 @@ function HomeView() {
 
   const handleRunAudit = async () => {
     try {
-      const result = runAudit(formData);
+      const result = runAudit({ ...formData, teamSize: Number(formData.teamSize) });
       setAuditResult(result);
       setView('results');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -37,15 +37,11 @@ function HomeView() {
         const data = await response.json();
         setPublicUrlId(data.publicUrlId);
       } else {
-        // Fallback random ID if database save failed
-        const generatedId = Math.random().toString(36).substring(2, 10);
-        setPublicUrlId(generatedId);
+        setPublicUrlId('');
       }
     } catch (err) {
       console.error('Failed to run/save audit:', err);
-      // Fallback random ID if network error occurred
-      const generatedId = Math.random().toString(36).substring(2, 10);
-      setPublicUrlId(generatedId);
+      setPublicUrlId('');
     }
   };
 
@@ -75,7 +71,8 @@ function HomeView() {
             className="flex items-center gap-2.5 cursor-pointer select-none group"
           >
             <div className="w-8 h-8 rounded-lg overflow-hidden bg-sea-dark border border-sea-medium/30 flex items-center justify-center p-1 group-hover:border-sea-light/50 transition-colors flex-shrink-0">
-              <img src="/logo.png" className="w-full h-full object-contain" alt="J Logo" />
+              {/* TODO: Replace logo.png (4.9MB) with an optimized version under 50KB */}
+              <img src="/logo.png" className="w-full h-full object-contain" alt="J Logo" width="32" height="32" loading="eager" decoding="async" />
             </div>
             <span className="font-bold text-white tracking-tight group-hover:text-sea-light transition-colors">
               JustCheckin

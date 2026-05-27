@@ -11,7 +11,6 @@ export default function AuditResults({ auditResult, teamSize, auditData, onBackT
   const [summaryLoading, setSummaryLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setSummaryLoading(true), 0);
     fetch('/api/generate-summary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
