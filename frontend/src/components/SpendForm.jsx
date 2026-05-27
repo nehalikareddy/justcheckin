@@ -279,7 +279,7 @@ export default function SpendForm({ formData, setFormData, onSubmit }) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
         {/* COLUMN 1: Configuration & Selection */}
-        <div className="lg:col-span-4 space-y-5">
+        <div className="lg:col-span-3 space-y-5">
           {/* Team Setup */}
           <div className="space-y-3.5">
             <label className="block font-mono text-[10px] uppercase tracking-wider text-sea-cream/90 font-bold">
@@ -458,7 +458,7 @@ export default function SpendForm({ formData, setFormData, onSubmit }) {
         </div>
 
         {/* COLUMN 3: Cost Summary & Quick Insights */}
-        <div className="lg:col-span-3 space-y-5">
+        <div className="lg:col-span-4 space-y-5">
           <label className="block font-mono text-[10px] uppercase tracking-wider text-sea-cream/90 font-bold">
             04. Live Analytics
           </label>

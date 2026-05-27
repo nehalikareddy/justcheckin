@@ -30,11 +30,7 @@ export default function PublicReport() {
   }, [publicUrlId]);
 
   useEffect(() => {
-    if (audit && audit.totalMonthlySavings !== undefined) {
-      document.title = `AI Spend Audit — Save $${audit.totalMonthlySavings}/mo | JustCheckin`;
-    } else {
-      document.title = 'AI Spend Audit | JustCheckin';
-    }
+    document.title = 'JustCheckin';
   }, [audit]);
 
   const formatCurrency = (val) => {

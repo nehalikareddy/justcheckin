@@ -13,7 +13,7 @@ const TOOLS = [
 // ── Floating "Example Report" card ───────────────────────────────────────────
 function SampleCard() {
   return (
-    <div className="animate-float pointer-events-none select-none w-full max-w-[400px]">
+    <div className="animate-float pointer-events-none select-none w-full max-w-[460px]">
       <div
         className="glass-card rounded-2xl p-7 shadow-[0_24px_64px_rgba(0,0,0,0.55)]"
         style={{ border: '1px solid rgba(65,90,119,0.38)' }}
@@ -62,12 +62,11 @@ function SampleCard() {
   );
 }
 
-// ── Hero — fills viewport, full bleed, no scroll ──────────────────────────────
+// ── Hero — fills viewport, full bleed, responsive ──────────────────────────────
 export default function Hero({ onStartAudit }) {
   return (
     <div
-      className="relative w-full flex flex-col overflow-hidden"
-      style={{ height: 'calc(100vh - 65px)' }}  /* exact remaining height after header */
+      className="relative w-full flex flex-col h-auto md:h-[calc(100vh-65px)] min-h-[calc(100vh-65px)] md:min-h-0 overflow-y-auto md:overflow-hidden"
     >
       {/* Ambient glows */}
       <div className="absolute top-[-10%] left-[10%] w-[700px] h-[700px] rounded-full bg-sea-medium/[0.06] blur-[140px] pointer-events-none" />
@@ -75,7 +74,7 @@ export default function Hero({ onStartAudit }) {
       <div className="absolute inset-0 bg-grid-pattern pointer-events-none opacity-50" />
 
       {/* ── Main two-column body ── */}
-      <div className="relative z-10 flex-1 flex items-center px-10 xl:px-20 gap-12 xl:gap-20 min-h-0">
+      <div className="relative z-10 flex-1 flex flex-col md:flex-row items-center px-6 md:px-10 xl:px-20 py-8 md:py-0 gap-10 xl:gap-20 min-h-0">
 
         {/* LEFT */}
         <div className="flex-1 min-w-0 space-y-6">
@@ -126,19 +125,19 @@ export default function Hero({ onStartAudit }) {
         </div>
 
         {/* RIGHT — sample card */}
-        <div className="flex-shrink-0 flex items-center justify-center animate-fade-in-up delay-200">
+        <div className="flex-shrink-0 flex items-center justify-center animate-fade-in-up delay-200 md:-translate-x-8 lg:-translate-x-16 xl:-translate-x-28">
           <SampleCard />
         </div>
       </div>
 
       {/* ── Tool marquee — pinned to bottom ── */}
-      <div className="relative z-10 border-t border-sea-medium/15 bg-sea-darkest/40 backdrop-blur-sm px-10 xl:px-20 py-3 flex items-center gap-6 flex-shrink-0">
+      <div className="relative z-10 border-t border-sea-medium/15 bg-sea-darkest/40 backdrop-blur-sm px-6 md:px-10 xl:px-20 py-3.5 flex items-center gap-6 flex-shrink-0 mt-auto">
         <p className="text-[9px] uppercase tracking-widest text-sea-medium/50 font-semibold whitespace-nowrap flex-shrink-0">
           Audits tools like
         </p>
         <div className="overflow-hidden flex-1">
           <div className="animate-marquee">
-            {[...TOOLS, ...TOOLS].map(({ name, abbr }, idx) => (
+            {[...TOOLS, ...TOOLS, ...TOOLS, ...TOOLS].map(({ name, abbr }, idx) => (
               <div
                 key={`${name}-${idx}`}
                 className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 mr-2.5 rounded-lg bg-sea-dark/70 border border-sea-medium/15 text-sea-light text-[10px] font-medium whitespace-nowrap"
