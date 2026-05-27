@@ -8,7 +8,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [localPublicUrlId, setLocalPublicUrlId] = useState('');
+  const [localPublicUrlId] = useState('');
   const [emailSkipped, setEmailSkipped] = useState(false);
 
   // Determine CTA text based on savings thresholds
@@ -56,7 +56,7 @@ export default function EmailGate({ totalSavings, teamSize, auditData, publicUrl
         setEmailSkipped(true);
       }
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       setErrorMsg('Could not send email. The server may be offline or email is not configured. Your audit results are still available on this page.');
     } finally {
       setLoading(false);
