@@ -177,6 +177,14 @@ export default function SpendForm({ formData, setFormData, onSubmit }) {
     e.preventDefault();
     if (validate()) {
       onSubmit();
+    } else {
+      setTimeout(() => {
+        // Find the first visible element that displays the validation error text
+        const firstErrorEl = document.querySelector('.text-red-400') || document.querySelector('.text-red-300');
+        if (firstErrorEl) {
+          firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
     }
   };
   const getPreAuditFlags = () => {
@@ -501,6 +509,24 @@ export default function SpendForm({ formData, setFormData, onSubmit }) {
 
             {/* Run Button */}
             <div className="border-t border-sea-medium/20 pt-4 mt-auto">
+              {Object.keys(errors).length > 0 && (
+                <div className="p-3.5 mb-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-semibold flex items-start gap-2.5 animate-pulse">
+                  <span className="text-sm leading-none flex-shrink-0">⚠️</span>
+                  <div className="flex-1 space-y-1">
+                    <p className="font-bold text-red-200">Validation Errors:</p>
+                    <ul className="list-disc list-inside space-y-0.5 text-[11px] text-red-300 font-normal">
+                      {errors.teamSize && <li>{errors.teamSize}</li>}
+                      {errors.tools && <li>{errors.tools}</li>}
+                      {Object.keys(errors).map(k => {
+                        if (k.startsWith('seats_')) {
+                          return <li key={k}>{errors[k]}</li>;
+                        }
+                        return null;
+                      })}
+                    </ul>
+                  </div>
+                </div>
+              )}
               <button
                 type="submit"
                 className="w-full py-3.5 font-bold text-sea-darkest bg-sea-cream hover:bg-white border border-sea-cream/25 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_4px_15px_rgba(141,169,224,0.15)] active:scale-[0.98] text-sm cursor-pointer"

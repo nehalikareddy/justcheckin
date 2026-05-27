@@ -221,14 +221,10 @@ export default function PublicReport() {
         <div className="max-w-[1600px] mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-sea-light font-medium">
           <div className="flex items-center gap-1.5">
             <span>&copy; {new Date().getFullYear()} JustCheckin.</span>
-            <span>All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6">
             <a href="https://credex.rocks" target="_blank" rel="noopener noreferrer" className="hover:text-sea-cream transition-colors">
               Credex Savings Program
-            </a>
-            <a href="https://github.com/copilot" target="_blank" rel="noopener noreferrer" className="hover:text-sea-cream transition-colors">
-              Privacy Policy
             </a>
           </div>
         </div>

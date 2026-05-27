@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Hero from './components/Hero';
 import SpendForm from './components/SpendForm';
@@ -8,37 +8,13 @@ import { runAudit } from './auditEngine';
 
 function HomeView() {
   const [view, setView] = useState('landing');
-  const [formData, setFormData] = useState(() => {
-    try {
-      const saved = localStorage.getItem('justcheckin_form');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && Array.isArray(parsed.tools)) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to load saved form data from localStorage:', e);
-    }
-    return {
-      teamSize: '',
-      useCase: 'coding',
-      tools: []
-    };
+  const [formData, setFormData] = useState({
+    teamSize: '',
+    useCase: 'coding',
+    tools: []
   });
   const [auditResult, setAuditResult] = useState(null);
   const [publicUrlId, setPublicUrlId] = useState('');
-
-  // Save to localStorage on change only when on the form view
-  useEffect(() => {
-    if (view === 'form') {
-      try {
-        localStorage.setItem('justcheckin_form', JSON.stringify(formData));
-      } catch (e) {
-        console.warn('Failed to save form data to localStorage:', e);
-      }
-    }
-  }, [formData, view]);
 
   const handleRunAudit = async () => {
     try {
@@ -46,13 +22,6 @@ function HomeView() {
       setAuditResult(result);
       setView('results');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // Clear localStorage so next session starts fresh
-      try {
-        localStorage.removeItem('justcheckin_form');
-      } catch (e) {
-        console.warn('Failed to clear localStorage:', e);
-      }
 
       // Save audit to DB in the background immediately
       const response = await fetch('/api/save-audit', {
@@ -174,14 +143,10 @@ function HomeView() {
           <div className="max-w-[1600px] mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-sea-light font-medium">
             <div className="flex items-center gap-1.5">
               <span>&copy; {new Date().getFullYear()} JustCheckin.</span>
-              <span>All rights reserved.</span>
             </div>
             <div className="flex items-center gap-6">
               <a href="https://credex.rocks" target="_blank" rel="noopener noreferrer" className="hover:text-sea-cream transition-colors">
                 Credex Savings Program
-              </a>
-              <a href="https://github.com/copilot" target="_blank" rel="noopener noreferrer" className="hover:text-sea-cream transition-colors">
-                Privacy Policy
               </a>
             </div>
           </div>

@@ -19,14 +19,14 @@ function SampleCard() {
         style={{ border: '1px solid rgba(65,90,119,0.38)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[10px] text-sea-medium uppercase tracking-widest font-semibold">Example Report</p>
-            <p className="text-[15px] font-bold text-sea-cream mt-0.5">Acme Labs · 18 devs</p>
-          </div>
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[9px] font-semibold text-emerald-400 uppercase tracking-wide">Done</span>
+        <div className="mb-4">
+          <p className="text-[10px] text-sea-medium uppercase tracking-widest font-semibold">Example Report</p>
+          <div className="flex items-center justify-between gap-2 mt-0.5">
+            <p className="text-[15px] font-bold text-sea-cream">Acme Labs · 18 devs</p>
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex-shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[9px] font-semibold text-emerald-400 uppercase tracking-wide">Done</span>
+            </div>
           </div>
         </div>
 
