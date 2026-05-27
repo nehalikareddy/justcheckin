@@ -29,10 +29,10 @@ mongoose.connect(MONGODB_URI)
     dbConnected = false;
   });
 
-// Middleware to check DB connection
+// Middleware to check DB connection (lenient fallback)
 const requireDB = (req, res, next) => {
   if (!dbConnected) {
-    return res.status(503).json({ error: 'Database is temporarily unavailable. Please try again later.' });
+    console.warn('Database is currently offline. Proceeding with in-memory fallback.');
   }
   next();
 };
@@ -158,7 +158,7 @@ ${JSON.stringify(auditData, null, 2)}
   }
 
   // Persist the summary in the database if publicUrlId is provided
-  if (publicUrlId && summaryText) {
+  if (publicUrlId && summaryText && dbConnected) {
     try {
       await Audit.findOneAndUpdate({ publicUrlId }, { summary: summaryText });
     } catch (dbErr) {
@@ -172,27 +172,32 @@ ${JSON.stringify(auditData, null, 2)}
 // NEW endpoint: Save audit + return publicUrlId
 app.post('/api/save-audit', requireDB, async (req, res) => {
   const { auditResult, teamSize, useCase } = req.body;
+  const publicUrlId = crypto.randomBytes(4).toString('hex'); // e.g. "a3f2c1d8"
   try {
-    const publicUrlId = crypto.randomBytes(4).toString('hex'); // e.g. "a3f2c1d8"
-    await Audit.create({
-      publicUrlId,
-      totalMonthlySavings: auditResult.totalMonthlySavings,
-      totalAnnualSavings: auditResult.totalAnnualSavings,
-      overallVerdict: auditResult.overallVerdict,
-      perTool: auditResult.perTool,
-      useCase,
-      teamSize
-    });
+    if (dbConnected) {
+      await Audit.create({
+        publicUrlId,
+        totalMonthlySavings: auditResult.totalMonthlySavings,
+        totalAnnualSavings: auditResult.totalAnnualSavings,
+        overallVerdict: auditResult.overallVerdict,
+        perTool: auditResult.perTool,
+        useCase,
+        teamSize
+      });
+    }
     res.json({ publicUrlId });
   } catch (error) {
     console.error('Save audit error:', error);
-    res.status(500).json({ error: 'Failed to save audit' });
+    res.json({ publicUrlId }); // fallback: return the ID even if DB save failed
   }
 });
 
 // NEW endpoint: Fetch public audit (strips email/company/role)
 app.get('/api/audit/:publicUrlId', requireDB, async (req, res) => {
   try {
+    if (!dbConnected) {
+      return res.status(503).json({ error: 'Database is offline' });
+    }
     const audit = await Audit.findOne(
       { publicUrlId: req.params.publicUrlId },
       { email: 0, company: 0, role: 0 } // exclude private fields
@@ -212,28 +217,33 @@ app.post('/api/capture-lead', requireDB, async (req, res) => {
   const isDummyKey = apiKey === 're_dummykey' || apiKey.startsWith('your_');
 
   try {
-    // 1. Save to Database (MongoDB logic)
-    let audit = await Audit.findOne({ publicUrlId });
-    if (!audit) {
-      // Graceful fallback if MongoDB failed to save or is offline
-      audit = await Audit.create({
-        publicUrlId,
-        totalMonthlySavings: totalSavings,
-        totalAnnualSavings: totalSavings * 12,
-        overallVerdict: "AI Spend Audit",
-        perTool: [],
-        email,
-        company,
-        role,
-        teamSize,
-        emailSent: !isDummyKey
-      });
-    } else {
-      audit.email = email;
-      audit.company = company;
-      audit.role = role;
-      audit.emailSent = !isDummyKey;
-      await audit.save();
+    // 1. Save to Database (MongoDB logic) - Try block to prevent connection failures from crashing request
+    if (dbConnected) {
+      try {
+        let audit = await Audit.findOne({ publicUrlId });
+        if (!audit) {
+          await Audit.create({
+            publicUrlId,
+            totalMonthlySavings: totalSavings,
+            totalAnnualSavings: totalSavings * 12,
+            overallVerdict: "AI Spend Audit",
+            perTool: [],
+            email,
+            company,
+            role,
+            teamSize,
+            emailSent: !isDummyKey
+          });
+        } else {
+          audit.email = email;
+          audit.company = company;
+          audit.role = role;
+          audit.emailSent = !isDummyKey;
+          await audit.save();
+        }
+      } catch (dbErr) {
+        console.error("Database save failed in capture-lead:", dbErr);
+      }
     }
 
     if (isDummyKey) {

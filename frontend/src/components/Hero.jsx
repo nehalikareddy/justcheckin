@@ -88,7 +88,7 @@ export default function Hero({ onStartAudit }) {
           </div>
 
           {/* Headline */}
-          <h1 className="text-3xl sm:text-4xl xl:text-5.5xl font-extrabold tracking-tight text-sea-cream leading-[1.12] animate-fade-in-up delay-100">
+          <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold tracking-tight text-sea-cream leading-[1.12] animate-fade-in-up delay-100">
             The finance auditing system<br />
             for startup teams<br />
             and leaders
