@@ -5,7 +5,6 @@ const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const Audit = require('./models/Audit');
-const { Anthropic } = require('@anthropic-ai/sdk');
 const { Resend } = require('resend');
 
 const app = express();
@@ -108,46 +107,24 @@ ${JSON.stringify(auditData, null, 2)}
   let methodUsed = "";
 
   try {
-    // 1. Attempt Anthropic API (Primary)
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
-    if (anthropicKey && !anthropicKey.startsWith('dummy') && anthropicKey !== 'your_anthropic_api_key_here') {
+    // 1. Attempt Gemini API (Primary)
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (geminiKey && !geminiKey.startsWith('dummy') && geminiKey !== 'your_gemini_api_key_here') {
       try {
-        console.log("Attempting Anthropic API call for summary...");
-        const anthropicClient = new Anthropic({ apiKey: anthropicKey });
-        const response = await anthropicClient.messages.create({
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 200,
-          messages: [{ role: "user", content: promptContent }]
-        });
-        if (response.content && response.content[0] && response.content[0].text) {
-          summaryText = response.content[0].text.trim();
-          methodUsed = "Anthropic";
+        console.log("Attempting Gemini API call for summary...");
+        const data = await callGeminiAPI(geminiKey, promptContent);
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+          summaryText = data.candidates[0].content.parts[0].text.trim();
+          methodUsed = "Gemini";
+        } else {
+          throw new Error('Invalid response structure from Gemini API');
         }
-      } catch (anthropicError) {
-        console.warn("Anthropic API call failed, will try Gemini:", anthropicError.message);
+      } catch (geminiError) {
+        console.warn("Gemini API call failed, using static template fallback:", geminiError.message);
       }
     }
 
-    // 2. Attempt Gemini API (Fallback layer 1)
-    if (!summaryText) {
-      const geminiKey = process.env.GEMINI_API_KEY;
-      if (geminiKey && !geminiKey.startsWith('dummy')) {
-        try {
-          console.log("Attempting Gemini API call for summary...");
-          const data = await callGeminiAPI(geminiKey, promptContent);
-          if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-            summaryText = data.candidates[0].content.parts[0].text.trim();
-            methodUsed = "Gemini";
-          } else {
-            throw new Error('Invalid response structure from Gemini API');
-          }
-        } catch (geminiError) {
-          console.warn("Gemini API call failed, using static template fallback:", geminiError.message);
-        }
-      }
-    }
-
-    // 3. Static Template Fallback (Fallback layer 2)
+    // 2. Static Template Fallback (Primary Fallback)
     if (!summaryText) {
       console.log("Using static template fallback for summary.");
       const savings = auditData?.totalMonthlySavings || 0;

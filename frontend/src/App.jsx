@@ -29,14 +29,16 @@ function HomeView() {
   const [auditResult, setAuditResult] = useState(null);
   const [publicUrlId, setPublicUrlId] = useState('');
 
-  // Save to localStorage on change
+  // Save to localStorage on change only when on the form view
   useEffect(() => {
-    try {
-      localStorage.setItem('justcheckin_form', JSON.stringify(formData));
-    } catch (e) {
-      console.warn('Failed to save form data to localStorage:', e);
+    if (view === 'form') {
+      try {
+        localStorage.setItem('justcheckin_form', JSON.stringify(formData));
+      } catch (e) {
+        console.warn('Failed to save form data to localStorage:', e);
+      }
     }
-  }, [formData]);
+  }, [formData, view]);
 
   const handleRunAudit = async () => {
     try {
@@ -44,6 +46,13 @@ function HomeView() {
       setAuditResult(result);
       setView('results');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Clear localStorage so next session starts fresh
+      try {
+        localStorage.removeItem('justcheckin_form');
+      } catch (e) {
+        console.warn('Failed to clear localStorage:', e);
+      }
 
       // Save audit to DB in the background immediately
       const response = await fetch('/api/save-audit', {
@@ -94,8 +103,11 @@ function HomeView() {
           {/* Logo */}
           <div 
             onClick={() => setView('landing')} 
-            className="flex items-center gap-2 cursor-pointer select-none group"
+            className="flex items-center gap-2.5 cursor-pointer select-none group"
           >
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-sea-dark border border-sea-medium/30 flex items-center justify-center p-1 group-hover:border-sea-light/50 transition-colors flex-shrink-0">
+              <img src="/logo.png" className="w-full h-full object-contain" alt="J Logo" />
+            </div>
             <span className="font-bold text-white tracking-tight group-hover:text-sea-light transition-colors">
               JustCheckin
             </span>

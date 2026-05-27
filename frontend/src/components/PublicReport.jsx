@@ -52,12 +52,9 @@ export default function PublicReport() {
         <div className="max-w-[1600px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 select-none group">
-            <div className="w-8 h-8 rounded-lg bg-sea-dark border border-sea-medium/30 flex items-center justify-center group-hover:border-sea-light/50 transition-colors">
-              <svg className="w-4 h-4 text-sea-light group-hover:text-sea-cream transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9z" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M7 10l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+          <Link to="/" className="flex items-center gap-2.5 select-none group">
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-sea-dark border border-sea-medium/30 flex items-center justify-center p-1 group-hover:border-sea-light/50 transition-colors flex-shrink-0">
+              <img src="/logo.png" className="w-full h-full object-contain" alt="J Logo" />
             </div>
             <span className="font-bold text-white tracking-tight group-hover:text-sea-light transition-colors">
               JustCheckin
