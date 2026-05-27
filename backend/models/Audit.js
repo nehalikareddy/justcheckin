@@ -22,6 +22,7 @@ const AuditSchema = new mongoose.Schema({
   perTool: [ToolResultSchema],
   useCase: String,
   teamSize: Number,
+  summary: String,
   // Private data (stripped from public URL)
   email: String,
   company: String,

@@ -69,6 +69,31 @@ function auditTool(tool, teamSize, useCase, redundantTools, allTools) {
   const toolName = TOOL_NAMES[toolKey]
   const currentPlanPrice = getPlanPrice(toolKey, plan)
 
+  // 1. Credits Opportunity Check
+  let creditsOpportunity = null;
+  if (['anthropicApiDirect', 'openaiApiDirect', 'gemini'].includes(toolKey) && teamSize <= 25) {
+    creditsOpportunity = {
+      program: toolKey === 'openaiApiDirect' ? 'Microsoft for Startups ($2,500 OpenAI API credits)' :
+               toolKey === 'anthropicApiDirect' ? 'Anthropic Startup Accelerator ($3,000 Claude API credits)' :
+               'Google for Startups Cloud Program ($2,000 Vertex AI credits)',
+      reason: `Your team size (${teamSize}) qualifies you for free developer API credits. Apply to their startup program to secure credits instead of paying cash.`
+    };
+  }
+
+  // 2. Alternative Tool suggestions
+  let alternativeTool = null;
+  if (toolKey === 'githubCopilot' && plan === 'business') {
+    alternativeTool = {
+      name: 'Cursor Pro / Windsurf Pro',
+      reason: 'Instead of Copilot Business ($19/mo), consider Cursor Pro ($20/mo) or Windsurf Pro ($15/mo) which provide superior agentic autocomplete, inline chat, and codebase indexing.'
+    };
+  } else if (toolKey === 'chatgpt' && plan === 'team') {
+    alternativeTool = {
+      name: 'Claude Pro / Team',
+      reason: 'For intensive coding and complex math/reasoning tasks, Claude Pro ($20/mo) or Claude Team ($30/mo) generally outperforms ChatGPT Team.'
+    };
+  }
+
   const result = {
     toolKey,
     toolName,
@@ -79,7 +104,9 @@ function auditTool(tool, teamSize, useCase, redundantTools, allTools) {
     monthlySavings: 0,
     annualSavings: 0,
     flag: 'right-sized',
-    reason: ''
+    reason: '',
+    alternativeTool,
+    creditsOpportunity
   }
 
   if (redundantTools.includes(toolKey)) {
@@ -156,7 +183,6 @@ function auditTool(tool, teamSize, useCase, redundantTools, allTools) {
       const subscriptionCost = toolKey === 'anthropicApiDirect' ? 20 : 20
       if (subscriptionCost < monthlySpend) {
         result.flag = 'overpaying'
-        const recommendedToolKey = toolKey === 'anthropicApiDirect' ? 'claude' : 'chatgpt'
         const recommendedPlan = 'pro'
         result.recommendedPlan = capitalizePlan(recommendedPlan)
         result.recommendedSpend = subscriptionCost

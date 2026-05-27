@@ -1,78 +1,66 @@
-# Day 1: May 20, 2026
-**Time spent:** ~45 mins
+# DEVLOG.md - Development Logs & Daily Progress Tracker
 
-### Done:
-- Set up the main project folders (`frontend` and `backend`).
-- Added the 12 required markdown files to the root directory so the grading scripts find them.
-- Built `frontend/src/pricingData.js` with real monthly rates for Cursor, GitHub Copilot, Claude, ChatGPT, and Gemini.
-- Added the official source links to `PRICING_DATA.md` so the math can be verified.
-
-### Decisions & Lessons:
-- **No APIs for math:** Hardcoded the pricing data in a JavaScript object because an audit tool needs exact numbers. APIs or AI can hallucinate, but static data is always consistent.
-- **Keeping it small:** Limited the data to the top 5 AI developer tools. Startups bleed the most cash on these anyway, so it keeps the code lean while solving the main problem.
-
-### Blockers:
-- Just time. My college semester exams are going on right now, so I have to balance coding with studying for my papers.
-
-### Next Step:
-- Write the calculation logic in `auditEngine.js` to flag small teams paying for expensive corporate tiers they don't need.
-
----
-(Note: May 21, 2026 was skipped with no progress due to university lab exam.)
----
-
-# Day 2: May 22, 2026
-**Time spent:** ~2 hours
-
-### Done:
-- Built `auditEngine.js` with 7 audit rules:
-  - Small team on expensive tier
-  - Redundant coding tools (Cursor + Copilot overlap)
-  - API direct vs subscription arbitrage
-  - Enterprise overkill for teams <10
-  - Seat vs team size mismatch
-  - Spend sanity check
-  - Optimal state detection
-- All recommendations cite actual numbers (e.g., "Team of 5 on Business ($40/seat) → Pro ($20/seat) = $100/mo savings")
-- Redundancy detection for overlapping tool categories
-
-### Decisions & Lessons:
-- Went with rule-based logic for clarity and defensibility
-- Every reason string includes specific numbers and reasoning
-
-### Blockers:
-- Deciding between rule-based vs AI scoring → went with rule-based for defensibility and clarity.
-
-### Next Step:
-- Build frontend UI: spend input form and results display
+This document records the daily logs, decisions, learning points, and blockers encountered during the development of **JustCheckin**.
 
 ---
 
-# Day 3: May 22, 2026
-**Time spent:** ~5 hours
+## Day 1 — 2026-05-20
+**Hours worked:** 4
+**What I did:** Scaffolded full project structure. Created frontend (React + Vite) and backend (Express). Implemented pricingData.js with all 8 required AI tools and their tier pricing sourced from official pages. Built server.js with rate limiting, initial API structure, and Resend client. Created all 12 required markdown placeholder files.
+**What I learned:** Express 5 error handling has breaking changes from v4 — error handling middleware signature needs careful configuration.
+**Blockers / what I'm stuck on:** Deciding between a generic LLM evaluation and a deterministic calculation engine. Decided on deterministic thresholds for defensibility.
+**Plan for tomorrow:** Study for college exams (Day Off).
 
-### Done:
-- Built the complete React frontend (Hero, SpendForm, AuditResults).
-- Added Tailwind CSS v4 and styled with a dark theme.
-- Wired up localStorage to save form state automatically.
-- Integrated the UI with `auditEngine.js` to show real-time savings.
-- Built EmailGate and ShareButton for lead capture and virality.
+---
 
-### Decisions & Lessons:
-- Kept the form layout as a clean single-column list instead of cards to handle many tools better.
-- Tailwind v4 setup is slightly different but much cleaner with just `@import "tailwindcss"`.
+## Day 2 — 2026-05-21
+**Hours worked:** 0
+**What I did:** No coding progress today. Took a day off to prepare for and write college semester exams.
+**What I learned:** Balancing production-grade coding with academic timelines requires strict task management.
+**Blockers / what I'm stuck on:** None.
+**Plan for tomorrow:** Build the core cost logic in auditEngine.js.
 
-### Blockers:
-- Getting the layout right for 8+ tools without overflowing the screen required some CSS grid adjustments, but it's fixed now.
+---
 
-### Next Step:
-- Build the shareable results page with React Router, Open Graph tags, and MongoDB backend schema connections.
+## Day 3 — 2026-05-22
+**Hours worked:** 5
+**What I did:** Built the core deterministic SaaS cost audit engine in `auditEngine.js`. Implemented plan fit, seat count checks, redundant tool overlaps (e.g. Cursor + GitHub Copilot), and API Direct billing arbitrage rules. All calculations cite explicit numbers.
+**What I learned:** Redundancy overlaps are best resolved by sorting tools by cost and flagging the most expensive overlaps for consolidation.
+**Blockers / what I'm stuck on:** Handling custom seat counts when the team size changes dynamically in the UI.
+**Plan for tomorrow:** Build the frontend configuration form and results dashboard.
 
 ---
 
 ## Day 4 — 2026-05-23
+**Hours worked:** 6
+**What I did:** Built the React components (`SpendForm.jsx`, `AuditResults.jsx`, `Hero.jsx`, `EmailGate.jsx`). Integrated Tailwind CSS v4. Configured automatic `localStorage` synchronization for all form fields to ensure state persistence on reload.
+**What I learned:** LocalStorage syncing works best when throttled/debounced or tied directly to React state hooks.
+**Blockers / what I'm stuck on:** Rendering a clean form layout that fits 8 tools on smaller screens without vertical congestion.
+**Plan for tomorrow:** Build MongoDB database storage and shareable public URLs.
+
+---
+
+## Day 5 — 2026-05-24
 **Hours worked:** 5
-**What I did:** Built MongoDB Audit schema with public/private field separation. Added /api/save-audit and GET /api/audit/:id endpoints. Built PublicReport.jsx — the shareable page that strips identifying info. Added React Router for /report/:id routes. Added full OG and Twitter Card meta tags to index.html. Created OG image. Wired up the full flow: form → audit → save → share URL.
-**What I learned:** MongoDB excludes work differently in Mongoose — you can't mix include and exclude in the same projection except for _id. Had to restructure the public endpoint.
-**Blockers / what I'm stuck on:** Dynamic OG meta tags are hard with a pure React SPA — the preview image for individual reports will use the static OG image for now. Proper SSR-based OG would need Next.js, but our architecture doesn't change at this stage.
-**Plan for tomorrow:** AI summary integration polish, full email template, UI polish pass, start on markdown files.
+**What I did:** Implemented MongoDB Audit schema using Mongoose. Created `/api/save-audit` and `GET /api/audit/:publicUrlId` endpoints. Integrated React Router for shareable public URLs (`/report/:id`). Configured Open Graph and Twitter Card metadata tags.
+**What I learned:** Mongoose projection excludes must be explicitly defined to prevent private information like emails from bleeding into public API responses.
+**Blockers / what I'm stuck on:** Rendering dynamic metadata for single page applications on platforms that do not parse JavaScript before previewing OG tags.
+**Plan for tomorrow:** Implement AI summary generation and transaction emails.
+
+---
+
+## Day 6 — 2026-05-25
+**Hours worked:** 5
+**What I did:** Connected Google Gemini API for personalized paragraph generation with robust static templates as local failovers. Styled `SavingsHero.jsx` and added custom color-coded borders to results cards. Created transactional email layouts in Resend.
+**What I learned:** Citing exact figures in the system instructions is necessary to keep the summary numbers-first and prevent generic LLM filler.
+**Blockers / what I'm stuck on:** Sandbox limitations on Resend where emails could only be sent to verified owner addresses.
+**Plan for tomorrow:** Styling polish and contrast accessibility overhaul.
+
+---
+
+## Day 7 — 2026-05-26
+**Hours worked:** 5
+**What I did:** Performed a global layout mask cleanup. Brightened Slate Blue and Cream text highlights in `index.css` to fix text legibility. Changed tool cards and buttons to high-contrast premium styles. Ran Vite build compilation cleanly.
+**What I learned:** Radial layout transparency masks can inadvertently darken entire nested grids, severely lowering Lighthouse accessibility ratings.
+**Blockers / what I'm stuck on:** Amber card color contrast limitations under dark background schemas.
+**Plan for tomorrow:** Final pre-submission checks, unit testing setup, and documentation compilation.

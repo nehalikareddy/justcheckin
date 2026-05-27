@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import SavingsHero from './SavingsHero';
 import ToolResult from './ToolResult';
@@ -10,7 +10,7 @@ export default function PublicReport() {
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    setLoading(true);
+    setTimeout(() => setLoading(true), 0);
     fetch(`/api/audit/${publicUrlId}`)
       .then((res) => {
         if (!res.ok) {
@@ -46,41 +46,41 @@ export default function PublicReport() {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col bg-zinc-950 text-zinc-100 bg-grid-pattern selection:bg-emerald-500/20 selection:text-emerald-200">
+    <div className="min-h-screen relative flex flex-col bg-sea-darkest text-sea-cream bg-grid-pattern selection:bg-sea-medium/40 selection:text-sea-cream">
       
       {/* Background Gradient Line at the very top */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent" />
+      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-sea-medium/30 to-transparent" />
 
       {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 w-full border-b border-sea-medium/20 bg-sea-darkest/85 backdrop-blur-md">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 select-none group">
-            <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:border-zinc-700 transition-colors">
-              <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="w-8 h-8 rounded-lg bg-sea-dark border border-sea-medium/30 flex items-center justify-center group-hover:border-sea-light/50 transition-colors">
+              <svg className="w-4 h-4 text-sea-light group-hover:text-sea-cream transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9z" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M7 10l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span className="font-bold text-white tracking-tight group-hover:text-zinc-200 transition-colors">
+            <span className="font-bold text-white tracking-tight group-hover:text-sea-light transition-colors">
               JustCheckin
             </span>
-            <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded text-zinc-500 tracking-wider">
+            <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.5 bg-sea-dark border border-sea-medium/20 rounded text-sea-light tracking-wider">
               Audit
             </span>
           </Link>
 
           {/* Right Header Navigation */}
           <nav className="flex items-center gap-4">
-            <Link to="/" className="text-xs text-zinc-400 hover:text-white transition-colors">
+            <Link to="/" className="text-xs text-sea-light hover:text-sea-cream transition-colors">
               Home
             </Link>
             <a
               href="https://credex.rocks"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-emerald-500/30 hover:text-white rounded-md text-zinc-400 transition-all font-medium"
+              className="text-xs px-3 py-1.5 bg-sea-dark border border-sea-medium/40 hover:border-sea-light hover:text-sea-cream rounded-md text-sea-light transition-all font-medium"
             >
               Talk to Credex
             </a>
@@ -93,8 +93,8 @@ export default function PublicReport() {
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 relative">
         {loading && (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="w-8 h-8 border-2 border-emerald-500/20 border-t-emerald-400 rounded-full animate-spin" />
-            <p className="text-sm text-zinc-400 font-mono">Loading audit report...</p>
+            <div className="w-8 h-8 border-2 border-sea-medium/30 border-t-sea-light rounded-full animate-spin" />
+            <p className="text-sm text-sea-light font-mono">Loading audit report...</p>
           </div>
         )}
 
@@ -106,13 +106,13 @@ export default function PublicReport() {
               </svg>
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-white">Oops! Something went wrong</h3>
-              <p className="text-sm text-zinc-400 max-w-md mx-auto">{errorMsg}</p>
+              <h3 className="text-xl font-bold text-sea-cream">Oops! Something went wrong</h3>
+              <p className="text-sm text-sea-light max-w-md mx-auto">{errorMsg}</p>
             </div>
             <div className="pt-4">
               <Link
                 to="/"
-                className="inline-flex items-center justify-center px-5 py-2.5 font-bold text-zinc-950 bg-white hover:bg-zinc-200 rounded-xl text-sm transition-all"
+                className="inline-flex items-center justify-center px-5 py-2.5 font-semibold text-sea-darkest bg-sea-cream hover:bg-white rounded-xl text-sm transition-all shadow-[0_4px_12px_rgba(13,27,42,0.4)]"
               >
                 Go to Homepage
               </Link>
@@ -123,12 +123,12 @@ export default function PublicReport() {
         {!loading && !errorMsg && audit && (
           <div className="space-y-8 animate-fade-in">
             {/* Header info */}
-            <div className="flex justify-between items-center pb-4 border-b border-zinc-800/60">
+            <div className="flex justify-between items-center pb-4 border-b border-sea-medium/20">
               <div className="flex flex-col gap-1">
-                <h2 className="text-xl font-extrabold text-white tracking-tight">AI Stack Spend Audit</h2>
-                <p className="text-xs text-zinc-500 font-mono">Public Report ID: {audit.publicUrlId}</p>
+                <h2 className="text-xl font-extrabold text-sea-cream tracking-tight">AI Stack Spend Audit</h2>
+                <p className="text-xs text-sea-light/60 font-mono">Public Report ID: {audit.publicUrlId}</p>
               </div>
-              <span className="text-xs text-zinc-500 font-medium bg-zinc-900 px-3 py-1 border border-zinc-800 rounded-full">
+              <span className="text-xs text-sea-light font-medium bg-sea-dark px-3 py-1 border border-sea-medium/30 rounded-full">
                 Audited for {audit.teamSize} seat{audit.teamSize > 1 ? 's' : ''}
               </span>
             </div>
@@ -139,15 +139,37 @@ export default function PublicReport() {
               annualSavings={audit.totalAnnualSavings}
             />
 
+            {/* AI Summary Card */}
+            {audit.summary && (
+              <div className="relative overflow-hidden p-6 bg-sea-dark/35 border border-sea-medium/20 rounded-2xl glass-card animate-fade-in space-y-3">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-sea-medium/5 blur-2xl rounded-full pointer-events-none" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg className="w-5 h-5 text-sea-light" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3.096 15.125 8.192 14.313 9 9.219l.813 5.094 5.096.813-5.096.813z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.071 4.929l-.707.707-.707-.707.707-.707.707.707zM17.657 16.243l-.707.707-.707-.707.707-.707.707.707zM6.343 6.343l-.707.707-.707-.707.707-.707.707.707z" />
+                    </svg>
+                    <span className="font-mono text-xs uppercase tracking-widest text-sea-light font-bold">
+                      AI Auditor Summary
+                    </span>
+                  </div>
+                  <p className="text-sm md:text-base text-sea-cream leading-relaxed font-sans italic selection:bg-sea-medium/35 selection:text-sea-cream">
+                    "{audit.summary}"
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Credex Program Callout if substantial savings */}
             {audit.totalMonthlySavings > 500 && (
-              <div className="relative overflow-hidden p-6 bg-zinc-900/40 border border-zinc-700/40 rounded-2xl glass-card text-center space-y-4">
-                <div className="absolute inset-0 bg-white/[0.02] blur-xl pointer-events-none" />
+              <div className="relative overflow-hidden p-6 bg-sea-dark/45 border border-sea-medium/20 rounded-2xl glass-card text-center space-y-4">
+                <div className="absolute inset-0 bg-sea-light/[0.01] blur-xl pointer-events-none" />
                 <div className="relative z-10 max-w-2xl mx-auto space-y-3">
-                  <h3 className="text-xl md:text-2xl font-extrabold text-white">
+                  <h3 className="text-xl md:text-2xl font-extrabold text-sea-cream">
                     Unlock up to {formatCurrency(audit.totalMonthlySavings)}/mo savings
                   </h3>
-                  <p className="text-sm text-zinc-300 leading-relaxed">
+                  <p className="text-sm text-sea-light leading-relaxed">
                     Credex helps teams scale down expensive subscriptions and save up to 40% off retail prices on primary developer/designer software licenses.
                   </p>
                   <div className="pt-2">
@@ -155,7 +177,7 @@ export default function PublicReport() {
                       href="https://credex.rocks"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-6 py-3 font-bold text-zinc-950 bg-white hover:bg-zinc-200 rounded-xl text-sm transition-all duration-200 hover:scale-105"
+                      className="inline-flex items-center justify-center px-6 py-3 font-semibold text-sea-darkest bg-sea-cream hover:bg-white rounded-xl text-sm transition-all duration-200 hover:scale-102 active:scale-98 shadow-[0_4px_12px_rgba(13,27,42,0.4)]"
                     >
                       Learn More on Credex →
                     </a>
@@ -166,7 +188,7 @@ export default function PublicReport() {
 
             {/* Tool Results list */}
             <div className="space-y-4">
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-1">
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-sea-light/60 mb-1">
                 Detailed Analysis by Tool
               </h3>
               <div className="space-y-4">
@@ -175,7 +197,7 @@ export default function PublicReport() {
                     <ToolResult key={toolResult.toolKey || toolResult._id} result={toolResult} />
                   ))
                 ) : (
-                  <div className="p-8 border border-zinc-800 bg-zinc-900/20 text-center text-sm text-zinc-500 rounded-xl">
+                  <div className="p-8 border border-sea-medium/20 bg-sea-dark/10 text-center text-sm text-sea-light/60 rounded-xl">
                     No individual tools were configured for this audit.
                   </div>
                 )}
@@ -183,15 +205,15 @@ export default function PublicReport() {
             </div>
 
             {/* Run Audit CTA at the bottom */}
-            <div className="pt-12 text-center border-t border-zinc-900 space-y-4">
-              <h4 className="text-base font-bold text-white">Want to run your own custom stack check?</h4>
-              <p className="text-sm text-zinc-400 max-w-md mx-auto">
+            <div className="pt-12 text-center border-t border-sea-medium/20 space-y-4">
+              <h4 className="text-base font-bold text-sea-cream">Want to run your own custom stack check?</h4>
+              <p className="text-sm text-sea-light max-w-md mx-auto">
                 JustCheckin scans your AI tool spend to discover seat overlaps, tier arbitrage opportunities, and optimal plans.
               </p>
               <div className="pt-2">
                 <Link
                   to="/"
-                  className="inline-flex items-center justify-center px-6 py-3 font-bold text-zinc-950 bg-white hover:bg-zinc-200 rounded-xl text-sm transition-all duration-200 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95"
+                  className="inline-flex items-center justify-center px-6 py-3 font-semibold text-sea-darkest bg-sea-cream hover:bg-white rounded-xl text-sm transition-all duration-200 shadow-[0_4px_12px_rgba(13,27,42,0.4)] hover:scale-102 active:scale-98"
                 >
                   Run a Free Audit in 60s
                 </Link>
@@ -202,17 +224,17 @@ export default function PublicReport() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-zinc-900 py-8 bg-zinc-950/60 backdrop-blur-sm mt-12">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+      <footer className="w-full border-t border-sea-medium/25 py-8 bg-sea-darkest/60 backdrop-blur-sm mt-12">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-sea-light font-medium">
           <div className="flex items-center gap-1.5">
             <span>&copy; {new Date().getFullYear()} JustCheckin.</span>
             <span>All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="https://credex.rocks" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">
+            <a href="https://credex.rocks" target="_blank" rel="noopener noreferrer" className="hover:text-sea-cream transition-colors">
               Credex Savings Program
             </a>
-            <a href="https://github.com/copilot" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-400 transition-colors">
+            <a href="https://github.com/copilot" target="_blank" rel="noopener noreferrer" className="hover:text-sea-cream transition-colors">
               Privacy Policy
             </a>
           </div>
