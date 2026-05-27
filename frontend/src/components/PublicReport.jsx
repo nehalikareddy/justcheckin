@@ -37,7 +37,11 @@ export default function PublicReport() {
   }, [publicUrlId]);
 
   useEffect(() => {
-    document.title = 'JustCheckin';
+    if (audit) {
+      document.title = `AI Audit Report #${audit.publicUrlId} — JustCheckin`;
+    } else {
+      document.title = 'JustCheckin — AI Spend Audit';
+    }
   }, [audit]);
 
   const formatCurrency = (val) => {

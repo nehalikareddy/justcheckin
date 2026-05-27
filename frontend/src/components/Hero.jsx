@@ -84,7 +84,7 @@ export default function Hero({ onStartAudit }) {
             <span className="h-1.5 w-1.5 rounded-full bg-sea-light animate-pulse" />
             <span>Overpaying is dead</span>
             <span className="text-sea-medium/50">·</span>
-            <span className="normal-case font-sans text-sea-light/80">justcheckin.com/audit</span>
+            <span className="normal-case font-sans text-sea-light/80">justcheckin.vercel.app</span>
           </div>
 
           {/* Headline */}

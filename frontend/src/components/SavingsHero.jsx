@@ -45,10 +45,10 @@ export default function SavingsHero({ monthlySavings, annualSavings }) {
               {formattedMonthly} <span className="text-lg font-medium text-sea-light">/mo</span>
             </div>
             <p className="text-sea-cream font-semibold tracking-wide text-sm sm:text-base">
-              🎉 Your AI stack is fully optimized!
+              No savings detected.
             </p>
             <p className="text-xs text-sea-light max-w-md mx-auto leading-relaxed">
-              Excellent job! You are running an efficient setup with no redundant software tiers or over-provisioned seats.
+              Your stack is right-sized for your team and use case. Check back if your headcount or tooling changes.
             </p>
           </div>
         ) : monthlySavings < 100 ? (

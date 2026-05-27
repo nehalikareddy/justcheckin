@@ -52,7 +52,7 @@ function detectRedundancies(tools, useCase) {
   }
 
   const activeWritingTools = tools.filter(t => TOOL_CATEGORIES.writingContent.includes(t.toolKey))
-  if (activeWritingTools.length > 1 && (useCase === 'writing' || useCase === 'mixed')) {
+  if (activeWritingTools.length > 1 && (useCase === 'writing' || useCase === 'mixed' || useCase === 'data')) {
     activeWritingTools.sort((a, b) => a.monthlySpend - b.monthlySpend)
     for (let i = 1; i < activeWritingTools.length; i++) {
       if (!redundantTools.includes(activeWritingTools[i].toolKey)) {
@@ -122,7 +122,7 @@ function auditTool(tool, teamSize, useCase, redundantTools, allTools) {
       if (keeper.toolKey !== toolKey) {
         redundancyExplanation = `${TOOL_NAMES[keeper.toolKey]} (which you already have)`
       }
-    } else if (TOOL_CATEGORIES.writingContent.includes(toolKey) && (useCase === 'writing' || useCase === 'mixed')) {
+    } else if (TOOL_CATEGORIES.writingContent.includes(toolKey) && (useCase === 'writing' || useCase === 'mixed' || useCase === 'data')) {
       const writingTools = allTools.filter(t => TOOL_CATEGORIES.writingContent.includes(t.toolKey))
       const keeper = writingTools.reduce((prev, curr) => prev.monthlySpend < curr.monthlySpend ? prev : curr)
       if (keeper.toolKey !== toolKey) {
